@@ -1,0 +1,45 @@
+Why ?
+pour éviter d'utiliser des ports différents
+pour centraliser la conf SSL
+pour la flexibilité
+pour n'avoir besoin des droits root que sur une brique et pouvoir les abandonner ensuite (bind sur ports < 1024)
+
+Utilisation :
+
+Les droits des fichiers doivent être corrigés avant de lancer la stack avec docker-compose up -d :
+chcon -u system_u -r object_r -t svirt_sandbox_file_t crontab
+
+# only first time :
+docker network create reverse-proxy
+docker volume create --name reverse-proxy_conf
+docker volume create --name reverse-proxy_conf_enabled
+docker volume create --name reverse-proxy_letsencrypt
+
+
+Pour ajouter/modifier un site :
+vim /var/lib/docker-latest/volumes/reverse-proxy_conf/_data/filetoedit.conf
+cat /var/lib/docker-latest/volumes/reverse-proxy_conf/_data/filetoedit.conf
+<VirtualHost *:80>
+    ServerName name.scimetis.net
+    ServerAdmin postmaster@scimetis.net
+    ProxyPreserveHost on
+    ProxyPass / http://hostname/
+    ProxyPassReverse / http://hostname/
+    ProxyRequests Off
+</VirtualHost>
+
+hostname dans la conf ci-dessus est en général le nom du conteneur qui fournit la ressource, 
+il devra donc rejoindre le réseau du reverse proxy. 
+C'est en général fait au niveau de la stack (docker-compose).
+Sinon :
+docker network connect reverse-proxy nomduconteneur
+
+# if new conf file :
+chcon -Rt svirt_sandbox_file_t /var/lib/docker-latest/volumes/reverse-proxy_conf/_data/filetoedit.conf
+docker exec -it dockerreverseproxystack_reverse-proxy_1 sh -c 'a2ensite filetoedit && service apache2 reload'
+# test certs :
+# docker exec -it dockerreverseproxystack_reverse-proxy_1 sh -c 'certbot --apache --test-cert -vvv --domains name.scimetis.net -m yohan.bataille@scimetis.net --agree-tos --reinstall --redirect --hsts --non-interactive'
+docker exec -it dockerreverseproxystack_reverse-proxy_1 sh -c 'certbot --apache -vvv --domains name.scimetis.net -m yohan.bataille@scimetis.net --agree-tos --reinstall --redirect --hsts --non-interactive'
+
+# if modified conf file :
+docker exec -it dockerreverseproxystack_reverse-proxy_1 sh -c 'service apache2 reload'

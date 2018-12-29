@@ -1,0 +1,40 @@
+version: "2.1"
+ 
+services:
+
+  reverse-proxy:
+    image: reverse-proxy:$VERSION
+    build: "https://git.scimetis.net/yohan/docker-reverse-proxy.git"
+    restart: always
+    ports:
+      - 80:80/tcp
+      - 443:443/tcp
+    networks:
+      - reverse-proxy
+    volumes:
+      - reverse-proxy_conf:/etc/apache2/sites-available:Z
+      - reverse-proxy_conf_enabled:/etc/apache2/sites-enabled:Z
+      - reverse-proxy_letsencrypt:/etc/letsencrypt:Z
+ 
+  cron:
+    image: cron
+    restart: always
+    network_mode: "host"
+    volumes:
+      - ./crontab:/etc/crontab
+ 
+networks:
+
+  reverse-proxy:
+    external: true
+
+volumes:
+
+  reverse-proxy_conf:
+    external: true
+
+  reverse-proxy_conf_enabled:
+    external: true
+
+  reverse-proxy_letsencrypt:
+    external: true
