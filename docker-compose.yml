@@ -3,7 +3,7 @@ version: "2.1"
 services:
 
   reverse-proxy:
-    image: reverse-proxy:$VERSION
+    image: reverse-proxy:$VERSION_PROXY
     build: "https://git.scimetis.net/yohan/docker-reverse-proxy.git"
     restart: always
     ports:
@@ -17,7 +17,8 @@ services:
       - reverse-proxy_letsencrypt:/etc/letsencrypt:Z
  
   cron:
-    image: cron
+    image: cron:$VERSION_CRON
+    build: "https://git.scimetis.net/yohan/docker-cron.git"
     restart: always
     network_mode: "host"
     volumes:
