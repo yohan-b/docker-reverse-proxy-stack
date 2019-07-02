@@ -8,4 +8,4 @@ SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 # m | h | day of month | month | day of week | user | command
-7     2         *          *          *        root   docker -H tcp://127.0.0.1:2375 exec dockerreverseproxystack_reverse-proxy_1 certbot renew > /proc/1/fd/2 2>&1
+5     2         *          *          *        root   docker -H tcp://127.0.0.1:2375 exec dockerreverseproxystack_reverse-proxy_1 certbot renew > /proc/1/fd/2 2>&1
