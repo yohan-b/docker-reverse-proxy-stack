@@ -1,5 +1,6 @@
 #!/bin/bash
 sudo chown root. crontab
+sudo chmod 644 crontab
 # --force-recreate is used to recreate container when crontab file has changed
 unset VERSION_PROXY VERSION_CRON
 VERSION_PROXY=$(git ls-remote ssh://git@git.scimetis.net:2222/yohan/docker-reverse-proxy.git| head -1 | cut -f 1|cut -c -10) \
