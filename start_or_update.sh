@@ -12,6 +12,7 @@ source ~/openrc.sh
 INSTANCE=$(~/env_py3/bin/openstack server show -c id --format value $(hostname))
 for VOLUME in reverse-proxy_conf reverse-proxy_conf_enabled reverse-proxy_letsencrypt
 do
+    mkdir -p /mnt/volumes/${VOLUME}
     if ! mountpoint -q /mnt/volumes/${VOLUME}
     then
          VOLUME_ID=$(/home/yohan/env_py3/bin/openstack volume show ${VOLUME} -c id --format value)
