@@ -1,5 +1,5 @@
 #!/bin/bash
-test -f ~/openrc.sh || exit 1
+test -f ~/openrc.sh || { echo "ERROR: ~/openrc.sh not found, exiting."; exit 1; }
 source ~/openrc.sh
 INSTANCE=$(~/env_py3/bin/openstack server show -c id --format value $(hostname))
 for VOLUME in reverse-proxy_conf reverse-proxy_conf_enabled reverse-proxy_letsencrypt
@@ -16,9 +16,10 @@ sudo chown root. crontab
 sudo chmod 644 crontab
 
 export OS_REGION_NAME=GRA
+test -f ~/duplicity_password.sh || { echo "ERROR: ~/duplicity_password.sh not found, exiting."; exit 1; }
 source ~/duplicity_password.sh
 
-sudo docker image inspect duplicity:latest &> /dev/null ||{ echo "ERROR: duplicity:latest image not found, exiting."; exit 1; }
+sudo docker image inspect duplicity:latest &> /dev/null || { echo "ERROR: duplicity:latest image not found, exiting."; exit 1; }
 
 rm -rf ~/build
 mkdir -p ~/build
