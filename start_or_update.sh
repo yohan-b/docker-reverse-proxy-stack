@@ -1,4 +1,12 @@
 #!/bin/bash
+for NETWORK in reverse-proxy
+do
+    sudo docker network inspect ${NETWORK} && continue
+    sudo docker network create ${NETWORK}
+    sudo docker network inspect ${NETWORK} || \
+    { echo "ERROR: could not create network ${NETWORK}, exiting."; exit 1; }
+done
+
 test -f ~/openrc.sh || { echo "ERROR: ~/openrc.sh not found, exiting."; exit 1; }
 source ~/openrc.sh
 INSTANCE=$(~/env_py3/bin/openstack server show -c id --format value $(hostname))
