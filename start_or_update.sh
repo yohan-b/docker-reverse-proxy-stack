@@ -1,9 +1,9 @@
 #!/bin/bash
 for NETWORK in reverse-proxy
 do
-    sudo docker network inspect ${NETWORK} && continue
+    sudo docker network inspect ${NETWORK} &> /dev/null && continue
     sudo docker network create ${NETWORK}
-    sudo docker network inspect ${NETWORK} || \
+    sudo docker network inspect ${NETWORK} &> /dev/null || \
     { echo "ERROR: could not create network ${NETWORK}, exiting."; exit 1; }
 done
 
@@ -23,9 +23,6 @@ do
     fi
 done
 
-sudo chown root. crontab
-sudo chmod 644 crontab
-
 export OS_REGION_NAME=GRA
 test -f ~/duplicity_password.sh || { echo "ERROR: ~/duplicity_password.sh not found, exiting."; exit 1; }
 source ~/duplicity_password.sh
@@ -34,7 +31,7 @@ sudo docker image inspect duplicity:latest &> /dev/null || { echo "ERROR: duplic
 
 rm -rf ~/build
 mkdir -p ~/build
-for name in docker-cron docker-reverse-proxy
+for name in docker-reverse-proxy
 do
     sudo -E docker run --rm -e SWIFT_USERNAME=$OS_USERNAME \
                             -e SWIFT_PASSWORD=$OS_PASSWORD \
@@ -49,13 +46,11 @@ do
 done
 
 # --force-recreate is used to recreate container when crontab file has changed
-unset VERSION_PROXY VERSION_CRON
+unset VERSION_PROXY
 DIRECTORY=$(pwd)
 cd ~/build/docker-reverse-proxy; export VERSION_PROXY=$(git show-ref --head| head -1 | cut -f 1|cut -c -10); cd $DIRECTORY
-cd ~/build/docker-cron; export VERSION_CRON=$(git show-ref --head| head -1 | cut -f 1|cut -c -10); cd $DIRECTORY
 
 sudo docker build -t reverse-proxy:$VERSION_PROXY ~/build/docker-reverse-proxy
-sudo docker build -t cron:$VERSION_CRON ~/build/docker-cron
 
 sudo -E bash -c 'docker-compose up -d --force-recreate'
 

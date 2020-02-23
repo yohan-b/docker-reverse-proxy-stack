@@ -16,14 +16,6 @@ services:
       - /mnt/volumes/reverse-proxy_conf_enabled/data:/etc/apache2/sites-enabled:Z
       - /mnt/volumes/reverse-proxy_letsencrypt/data:/etc/letsencrypt:Z
  
-  cron:
-    image: cron:$VERSION_CRON
-    #build: "https://git.scimetis.net/yohan/docker-cron.git"
-    restart: always
-    network_mode: "host"
-    volumes:
-      - ./crontab:/etc/crontab:Z
- 
 networks:
 
   reverse-proxy:
