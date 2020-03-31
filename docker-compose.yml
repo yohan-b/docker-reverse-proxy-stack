@@ -5,7 +5,6 @@ services:
   reverse-proxy:
     image: reverse-proxy:$VERSION_PROXY
     #build: "https://git.scimetis.net/yohan/docker-reverse-proxy.git"
-    restart: always
     ports:
       - 80:80/tcp
       - 443:443/tcp

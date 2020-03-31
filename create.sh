@@ -1,4 +1,11 @@
 #!/bin/bash
+#Absolute path to this script
+SCRIPT=$(readlink -f $0)
+#Absolute path this script is in
+SCRIPTPATH=$(dirname $SCRIPT)
+
+cd $SCRIPTPATH
+
 for NETWORK in reverse-proxy
 do
     sudo docker network inspect ${NETWORK} &> /dev/null && continue
@@ -9,20 +16,6 @@ done
 
 test -f ~/openrc.sh || { echo "ERROR: ~/openrc.sh not found, exiting."; exit 1; }
 source ~/openrc.sh
-INSTANCE=$(~/env_py3/bin/openstack server show -c id --format value $(hostname))
-for VOLUME in reverse-proxy_conf reverse-proxy_conf_enabled reverse-proxy_letsencrypt
-do
-    sudo mkdir -p /mnt/volumes/${VOLUME}
-    if ! mountpoint -q /mnt/volumes/${VOLUME}
-    then
-         VOLUME_ID=$(/home/yohan/env_py3/bin/openstack volume show ${VOLUME} -c id --format value)
-         test -e /dev/disk/by-id/*${VOLUME_ID:0:20} || nova volume-attach $INSTANCE $VOLUME_ID auto
-         sleep 3
-         sudo mount /dev/disk/by-id/*${VOLUME_ID:0:20} /mnt/volumes/${VOLUME}
-         mountpoint -q /mnt/volumes/${VOLUME} || { echo "ERROR: could not mount /mnt/volumes/${VOLUME}, exiting."; exit 1; }
-    fi
-done
-
 export OS_REGION_NAME=GRA
 test -f ~/duplicity_password.sh || { echo "ERROR: ~/duplicity_password.sh not found, exiting."; exit 1; }
 source ~/duplicity_password.sh
@@ -52,6 +45,6 @@ cd ~/build/docker-reverse-proxy; export VERSION_PROXY=$(git show-ref --head| hea
 
 sudo docker build -t reverse-proxy:$VERSION_PROXY ~/build/docker-reverse-proxy
 
-sudo -E bash -c 'docker-compose up -d --force-recreate'
+sudo -E bash -c 'docker-compose up --no-start --force-recreate'
 
 rm -rf ~/build
