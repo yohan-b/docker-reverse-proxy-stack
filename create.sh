@@ -40,8 +40,8 @@ done
 
 # --force-recreate is used to recreate container when crontab file has changed
 unset VERSION_PROXY
-DIRECTORY=$(pwd)
-cd ~/build/docker-reverse-proxy; export VERSION_PROXY=$(git show-ref --head| head -1 | cut -f 1|cut -c -10); cd $DIRECTORY
+cd ~/build/docker-reverse-proxy; export VERSION_PROXY=$(git show-ref --head| head -1 | cut -f 1|cut -c -10)
+cd $SCRIPTPATH
 
 sudo docker build -t reverse-proxy:$VERSION_PROXY ~/build/docker-reverse-proxy
 
