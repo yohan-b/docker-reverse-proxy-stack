@@ -6,6 +6,14 @@ SCRIPTPATH=$(dirname $SCRIPT)
 
 cd $SCRIPTPATH
 
+if test -z "$1" && [ "$1" != "bootstrap" ] && [ "$1" != "normal" ]
+then
+    echo "First argument must be \"bootstap\" or normal"
+    exit 1
+else
+    REPO="$1"
+fi
+
 for NETWORK in reverse-proxy
 do
     sudo docker network inspect ${NETWORK} &> /dev/null && continue
@@ -14,7 +22,7 @@ do
     { echo "ERROR: could not create network ${NETWORK}, exiting."; exit 1; }
 done
 
-if test -z "$1" || [ "$1" != "local" ]
+if [ "$REPO" == "bootstrap" ]
 then
     test -f ~/openrc.sh || { echo "ERROR: ~/openrc.sh not found, exiting."; exit 1; }
     source ~/openrc.sh
